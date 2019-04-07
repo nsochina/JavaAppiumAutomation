@@ -1,6 +1,7 @@
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -37,7 +38,7 @@ public class FirstTest {
 
     }
     @Test
-    public void FirstTest(){
+    public void FirstTest() {
 
         waitForElementAndClick(
                 By.xpath("//*[contains(@text,'Search Wikipedia')]"),
@@ -47,17 +48,41 @@ public class FirstTest {
         waitForElementPresent(
                 By.xpath("//*[contains(@text,'Search…')]"),
                 "Cannot find text 'Search…'",
+                5
+        );
+    }
+
+    @Test
+    public void testCancelSearch(){
+        waitForElementAndClick(
+                By.xpath("//*[contains(@text,'Search Wikipedia')]"),
+                "Cannot find SearchLine",
+                5);
+        waitForElementAndSendKeys (
+                By.xpath("//*[contains(@text,'Search…')]"),
+                "Apple",
+                "Cannot enter Apple",
                 15
         );
+        waitForElementPresent(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Apple TV']"),
+                "Cannot find Apple TV",
+                5
+                        );
 
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/search_close_btn"),
+                "Cannot find X ",
+                5);
 
-//        WebElement element_to_init_search = driver.findElementByXPath("//*[contains(@text,'Search Wikipedia')]");
-//        element_to_init_search.click();
-//        WebElement elemet_to_enter_search_line = driver.findElementById("");
-//       elemet_to_enter_search_line.sendKeys(""Java);
-
+        waitForElementPresent(
+                By.id("org.wikipedia:id/search_empty_image"),
+                "Not search_empty_image",
+                5
+        );
 
     }
+
     private WebElement waitForElementPresent(By by,String error_message, long timoutInSec)
     {
         WebDriverWait wait = new WebDriverWait(driver, timoutInSec);
@@ -70,12 +95,28 @@ public class FirstTest {
         return waitForElementPresent(by, error_message, 5);
 
     }
-    private WebElement waitForElementAndClick(By by,String error_message, long timeInSec)
+    private WebElement waitForElementAndClick(By by,String error_message, long timoutInSec)
     {
-        WebElement element = waitForElementPresent(by, error_message, timeInSec);
+        WebElement element = waitForElementPresent(by, error_message, timoutInSec);
         element.click();
         return element;
     }
+    private WebElement waitForElementAndSendKeys(By by, String key_name, String error_message, long timoutInSec)
+    {
+        WebElement element = waitForElementPresent(by, error_message, timoutInSec);
+        element.sendKeys(key_name);
+        return element;
+    }
+    private boolean waitForElementNotPresent(By by, String error_message, long timoutInSec)
+    {
+        WebDriverWait wait = new WebDriverWait(driver, timoutInSec);
+        wait.withMessage(error_message+'\n');
+        return wait.until(
+            ExpectedConditions.invisibilityOfElementLocated(by)
+        );
+    }
+
+
 
 
 }
